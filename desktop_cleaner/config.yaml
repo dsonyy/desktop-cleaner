@@ -1,7 +1,6 @@
-watching_path: C:\Users\Szymon\Desktop
-copy_to_path:
-move_after: 8
+watching_path:
+destination_path:
+move_file_after_hours: 8
+notify_after_files: 10
 items_ignore:
-    - DataNew
     - desktop.ini
-    - stuff

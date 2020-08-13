@@ -1,0 +1,7 @@
+watching_path: C:\Users\Szymon\Desktop
+copy_to_path: C:\Users\Szymon\Desktop\asdf
+move_after: 8
+items_ignore:
+    - DataNew
+    - desktop.ini
+    - stuff

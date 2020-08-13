@@ -1,2 +1,5 @@
 __pycache__
 .vscode
+build.bat
+hook-pystray.py
+release

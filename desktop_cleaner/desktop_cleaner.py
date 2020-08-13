@@ -65,7 +65,7 @@ def notify(text, ok=True):
         logging.critical(text)
         trayicon.notify(text, title="Desktop Cleaner Critical")
 
-def getusedtime(item):
+def get_used_time(item):
     """Get the latest timestamp of file access, modification or creation"""
     return max(os.path.getatime(item), 
         os.path.getctime(item), 
@@ -128,7 +128,7 @@ def scan() -> bool:
     if not config_load():
         return False
 
-    items = {item:getusedtime(os.path.join(watching_path, item)) 
+    items = {item:get_used_time(os.path.join(watching_path, item)) 
         for item in os.listdir(watching_path)}
 
     for item in items_ignore:

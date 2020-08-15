@@ -15,11 +15,11 @@
 
 **Desktop Cleaner** is a Windows software which automatically keeps old, unused, files and folders away from your desktop. If you are a type of person whose desktop sometimes looks like in the picture below, you should consider having a look at this program.
 
-<p style="text-align: center;"><img src="ext/usage.png"><p>
+<img src="ext/usage.png">
 
 The script works in a background and observes creation, modification and access dates of files and folders on your desktop. The Cleaner **doesn't remove** any of your files, it only moves them to the target directory so as to keep your watching directory tidy. It supports a tray icon which allows some basic controls and notifies you, when a certain number of unused files have been moved.
 
-<p style="text-align: center"><img src="ext/notifications.png"><p>
+<img src="ext/notifications.png">
 
 ## Usage
 
@@ -65,4 +65,5 @@ Every action the Cleaner performs is logged in the `desktop_cleaner.log` file:
 
 - Ignore files/directories greather than *x* GB (*x* configurable via config).
 - More intelligent scanning - Let's take an example. You have a file somewhere on a disk which was created, modified and accessed a very long time ago. You manually **move** this file to your desktop (thus, the dates stay the same as before). The Cleaner founds your file, checks the dates, and decides to move it from your desktop because of the old dates.
+- Add some tray icon menu options (`Show logs`, `Add every item to ignore`, `Add specified item to ignore`, `Configure`)
 - <sub><sup>Amazing deep neural network algorithm which will classify files to the various categories.</sup></sub>

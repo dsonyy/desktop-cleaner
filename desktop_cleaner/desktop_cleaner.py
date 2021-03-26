@@ -20,7 +20,7 @@ from time import time, sleep
 
 ICON_SIZE = (32, 32)
 ICON_COLOR = (79, 151, 238)
-REFRESH_RATE = 60 # seconds
+REFRESH_RATE = 60  # seconds
 
 running = True
 trayicon = None
@@ -30,12 +30,14 @@ move_file_after_hours = None
 notify_after_files = None
 items_ignore = None
 
+
 def quit():
     """Quit application"""
     logging.info("Quitting")
     trayicon.stop()
     global running
     running = False
+
 
 def trayicon_init():
     """Initialize trayicon"""
@@ -44,18 +46,19 @@ def trayicon_init():
     except:
         image = Image.new('RGB', ICON_SIZE, ICON_COLOR)
         logging.warning("Icon file not found")
-    
+
     menu = pystray.Menu(
         pystray.MenuItem("Exit", quit),
         pystray.MenuItem("Open watching directory",
-            lambda: os.startfile(watching_path)),
+                         lambda: os.startfile(watching_path)),
         pystray.MenuItem("Open destination directory",
-            lambda: os.startfile(destination_path)))
-    
+                         lambda: os.startfile(destination_path)))
+
     global trayicon
     trayicon = pystray.Icon("Desktop Cleaner", icon=image, menu=menu,
-        title="Desktop Cleaner")
+                            title="Desktop Cleaner")
     trayicon.run()
+
 
 def notify(text, ok=True):
     if ok:
@@ -65,11 +68,13 @@ def notify(text, ok=True):
         logging.critical(text)
         trayicon.notify(text, title="Desktop Cleaner Critical")
 
+
 def get_used_time(item):
     """Get the latest timestamp of file access, modification or creation"""
-    return max(os.path.getatime(item), 
-        os.path.getctime(item), 
-        os.path.getmtime(item))
+    return max(os.path.getatime(item),
+               os.path.getctime(item),
+               os.path.getmtime(item))
+
 
 def config_load() -> bool:
     """Load variables from config.yaml"""
@@ -80,7 +85,7 @@ def config_load() -> bool:
     global notify_after_files
 
     try:
-        with open("config.yaml", "r") as config_file:        
+        with open("config.yaml", "r") as config_file:
             config = yaml.safe_load(config_file)
             watching_path = config["watching_path"]
             destination_path = config["destination_path"]
@@ -96,12 +101,12 @@ def config_load() -> bool:
 
     if not items_ignore:
         items_ignore = []
-    
+
     if not watching_path:
         watching_path = os.path.join(os.environ["HOMEPATH"], "Desktop")
     if not os.path.exists(watching_path):
         notify("Watching path ({}) does not exist. "
-            .format(os.path.abspath(watching_path)), False)
+               .format(os.path.abspath(watching_path)), False)
         return False
 
     if not destination_path:
@@ -112,9 +117,9 @@ def config_load() -> bool:
             os.mkdir(destination_path)
         except OSError:
             notify("Destination path ({}) does not exist or cannot be created."
-                .format(os.path.abspath(destination_path)), False)
+                   .format(os.path.abspath(destination_path)), False)
             return False
-    
+
     if not move_file_after_hours:
         move_file_after_hours = 24 * 5
 
@@ -122,14 +127,15 @@ def config_load() -> bool:
         notify_after_files = 10
 
     return True
-    
+
+
 def scan() -> bool:
     """Scan desktop and move unused files"""
     if not config_load():
         return False
 
-    items = {item:get_used_time(os.path.join(watching_path, item)) 
-        for item in os.listdir(watching_path)}
+    items = {item: get_used_time(os.path.join(watching_path, item))
+             for item in os.listdir(watching_path)}
 
     for item in items_ignore:
         items.pop(item, None)
@@ -143,17 +149,18 @@ def scan() -> bool:
 
             while os.path.exists(destination):
                 basename, ext = os.path.splitext(destination)
-                destination = os.path.join(destination_path, basename + "-" + ext)
+                destination = os.path.join(
+                    destination_path, basename + "-" + ext)
 
             logging.info("Moving '{}' (last used {}h ago) to {}"
-                .format(original, round(timedelta, 1), destination))
+                         .format(original, round(timedelta, 1), destination))
 
             try:
                 shutil.move(original, destination)
                 moved = True
             except shutil.Error:
                 logging.warning("Error occured while moving '{}' to '{}'"
-                    .format(original, destination))
+                                .format(original, destination))
                 # shutil.move() copies files if it's unable to move them, so we
                 # have to remove copied files
                 try:
@@ -165,8 +172,8 @@ def scan() -> bool:
                     pass
             except PermissionError:
                 logging.warning("Permission error occured while moving '{}' to '{}'"
-                    .format(original, destination))
-                # shutil.move() copies files if it's unable to move them, so we 
+                                .format(original, destination))
+                # shutil.move() copies files if it's unable to move them, so we
                 # have to remove copied files
                 try:
                     if os.path.isdir(destination):
@@ -175,14 +182,15 @@ def scan() -> bool:
                         os.remove(destination)
                 except FileNotFoundError:
                     pass
-    
+
     if moved:
         total_items_moved = len(os.listdir(destination_path))
         if total_items_moved >= notify_after_files:
             notify("There are {} unused items moved from your desktop. "
-                "Take a look!".format(total_items_moved))
-    
+                   "Take a look!".format(total_items_moved))
+
     return True
+
 
 def update_ignore():
     """Collect every desktop file and put it on items_ignore in config.yaml"""
@@ -192,26 +200,28 @@ def update_ignore():
         watching_path = config["watching_path"]
         if not watching_path:
             watching_path = os.path.join(os.environ["HOMEPATH"], "Desktop")
-    
+
     config["items_ignore"] = os.listdir(watching_path)
 
     with open("config.yaml", "w") as config_file:
         yaml.dump(config, config_file)
 
+
 def loop():
     """Desktop scanning loop"""
-    sleep(2) # Wait for trayicon initialization
-    
+    sleep(2)  # Wait for trayicon initialization
+
     while running:
         if not scan():
             quit()
         else:
             sleep(REFRESH_RATE)
 
+
 def main():
     try:
         logging.basicConfig(filename="desktop_cleaner.log", level=logging.INFO,
-            format="%(asctime)s %(levelname)s: %(message)s")
+                            format="%(asctime)s %(levelname)s: %(message)s")
         logging.info(50 * "-")
         logging.info("Starting")
 
@@ -224,6 +234,7 @@ def main():
     except Exception as e:
         notify("Unexpected critical error occured.", False)
         logging.exception(e)
+
 
 if __name__ == "__main__":
     main()
